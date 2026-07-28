@@ -1,0 +1,156 @@
+package com.testcases;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.base.BaseClass;
+import com.pages.login_page;
+import com.pages.logout_page;
+import com.pages.order_backendorder_page;
+import com.utility.PropertyUtils;
+
+//engp-609
+public class elmsCreateTBDOrder_CreateActualOrder_EditActualOrder extends BaseClass {
+	login_page lp = null;
+	order_backendorder_page beo = null;
+	logout_page logpage = null;
+
+	// @BeforeClass//(alwaysRun = true)
+	@Test(priority = 1)
+	public void setup() throws Exception {
+		intialization();
+		System.out.println("webdriver intialized");
+		lp = new login_page(driver);
+		log.info("************** Opening URL *****************");
+	}
+
+	@Test(priority = 2)
+	public void login() throws Exception {
+		log.info("************** Verifying Login Test *****************");
+		Thread.sleep(5000);
+		log.info("we are inside login method of createaccounts class");
+		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
+		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
+
+		lp.loginToelms(elmsadminuser, elmsadminpassword);
+		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+		log.info("after successful login page title is: " + driver.getTitle());
+	}
+
+	@Test(priority = 3)
+	public void CreateTBDOrder() throws Exception {
+		beo = new order_backendorder_page(driver);
+		log.info("----------------TBD order creation will start-------------");
+		Thread.sleep(2000);// added on 31st jan 23 for preprod ins, after this it worked fine
+		beo.clickOnOrdersMenu();
+		Thread.sleep(1000);
+		
+		beo.selectCreateTBDOrderLink();
+		Thread.sleep(2000);
+		beo.generateInvoiceId();
+		beo.createTBDOrder();
+		Thread.sleep(4000);
+		
+	}
+	@Test(priority = 4)
+	public void CreateTBDActualOrder() throws Exception {
+		beo.clickCreateActualOrderbtn();
+		beo.generateCustomerWorkEmail();
+		beo.createNewCustomer();
+		Thread.sleep(5000);
+		beo.searchCustomerEmail();
+		Thread.sleep(3000);// ---
+		beo.selectSearchedCustomer();
+		Thread.sleep(10000);// ----
+		beo.selectProductFromDrpdown();
+		Thread.sleep(7000);// ----
+		beo.searchEventProduct();
+		Thread.sleep(5000);// ---------
+		beo.clickOnProductResult();
+		Thread.sleep(3000);
+		beo.addProductQty("1");
+		Thread.sleep(3000);
+		beo.clickOKButton();
+		Thread.sleep(5000);// ---
+		beo.clickAddSelectedProductToOrderBtn();
+		
+		Thread.sleep(8000);
+		beo.clicOnAddRegistrantsBtn();
+		Thread.sleep(3000);
+		beo.generateNewRegistrantsEmail();
+		beo.createNewRegistrant();
+		Thread.sleep(1000);
+
+		beo.saveRegistrant();
+		Thread.sleep(5000);
+		
+		beo.setFreeShipping();
+		Thread.sleep(1000);
+		beo.paylaterPaymentoptionActualOrder(); //this is set when we want to edit OR cancel actual order
+		
+		Thread.sleep(2000);
+		beo.order_submit();
+	
+	}
+	@Test(priority = 5)
+	public void CheckTBDActualOrder() throws Exception {
+		log.info("----------------Verification of TBD order-Actual Order will start-------------");
+		beo.clickOnOrdersMenu();
+		Thread.sleep(1000);
+		beo.clickTbdOrdersLink();
+		Thread.sleep(3000);
+		
+		beo.clearAllTBDOrderFilterLink();
+		Thread.sleep(2000);
+		beo.clickOnTBDOrderFiltersBtn();
+		Thread.sleep(1000);
+		beo.setInvoiceIdTBDOrderFilter();
+		beo.clickTBDOrderApplyfilterBtn();
+		Thread.sleep(3000);
+		beo.openFilteredTBDOrder();
+		Thread.sleep(5000);
+		//beo.sortandOpenTbdOrder();
+		beo.verifyOrderinGrid();
+	}
+	
+	@Test(priority = 6)
+	public void openActualOrderAndEditit() throws Exception {
+		log.info("----------------Edition of Actual order will start-------------");
+		beo.openActualOrderDetailspage();
+		Thread.sleep(5000);	
+		beo.clickEditOrderLink();
+		Thread.sleep(3000);
+		beo.increaseItemQty();
+		beo.clickUpdateItemsAndQtyBtn();
+		Thread.sleep(5000);
+		beo.clickRegistrantsSection();
+		Thread.sleep(2000);
+		beo.clicOnAddRegistrantsBtn();
+		Thread.sleep(2000);
+		beo.addExistingRegistrant2forActualOrder();
+		Thread.sleep(2000);
+		beo.saveRegistrant();
+		Thread.sleep(3000);
+		beo.setFreeShippingForEditOrder();
+		Thread.sleep(3000);
+		beo.paylaterPaymentoptionActualOrder();
+		Thread.sleep(5000);
+		beo.order_update();
+		Thread.sleep(2000);
+		beo.backToOriginalWindow();
+		beo.refreshTBDOrder();	
+		Thread.sleep(2000);
+		beo.checkQtyOfeditActualOrderAndtakeScreenshot();
+	}
+	
+	
+	@Test(priority = 7)
+	public void logout() throws Exception {
+		log.info("----------------ELMS Logout will start-------------");
+		logpage = new logout_page(driver);
+		logpage.elmsLogoutApplication();
+	
+	}
+	
+}
+

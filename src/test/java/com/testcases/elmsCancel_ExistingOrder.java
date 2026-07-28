@@ -1,0 +1,78 @@
+package com.testcases;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+import com.base.BaseClass;
+import com.pages.createevent_frontendorder_page1;
+import com.pages.login_page;
+import com.pages.logout_page;
+import com.pages.order_backendorder_page;
+import com.utility.PropertyUtils;
+
+public class elmsCancel_ExistingOrder extends BaseClass {
+
+	createevent_frontendorder_page1 cefe = null;
+	login_page lp = null;
+	logout_page logpage = null;
+	order_backendorder_page op=null;
+
+	@BeforeClass//(alwaysRun = true)
+	public void setup() throws Exception {
+		intialization();
+		System.out.println("webdriver intialized");
+		lp = new login_page(driver);
+		log.info("************** Opening URL *****************");
+	}
+
+	@Test(priority = 1)
+	public void login() throws Exception {
+		log.info("************** Verifying Login Test *****************");
+		Thread.sleep(5000);
+		log.info("we are inside login method of createaccounts class");
+		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
+		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
+
+		lp.loginToelms(elmsadminuser, elmsadminpassword);
+		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+		log.info("after successful login page title is: " + driver.getTitle());
+	}
+
+	
+	
+	@Test(priority = 2)
+	public void refundOrder() throws Exception {
+		//orderid
+		
+		op = new order_backendorder_page(driver);
+		op.clickOnOrdersMenu();
+		Thread.sleep(2000);
+		op.clickAllOrdersLink();
+		Thread.sleep(5000);
+		op.clearAllOrderFilterLink();
+		Thread.sleep(5000);
+		op.clickOnOrderFiltersBtn();
+		Thread.sleep(3000);
+		op.setCustomerFilter();
+		op.setOrderPendingStatusFilter();
+		Thread.sleep(2000);
+		op.clickApplyfilterBtn();		
+		Thread.sleep(5000);
+		op.selectFirstRecord();
+		Thread.sleep(3000);
+		op.clickCancelOrderLink();
+		Thread.sleep(5000);
+		op.confirmOrderCancel();
+		
+	}
+
+	@AfterClass//(priority = 3)
+	public void logout() throws Exception {
+		logpage = new logout_page(driver);
+		logpage.elmsLogoutApplication();
+	}
+
+}

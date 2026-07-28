@@ -1,0 +1,30 @@
+# Maven generated files
+target/
+
+# TestNG reports
+test-output/
+
+# Eclipse files
+.classpath
+.project
+.settings/
+
+# Selenium drivers
+*.exe
+
+# Logs
+*.log
+
+# Extent Reports
+*.html
+
+# Screenshots
+screenshots/
+
+# Temporary files
+*.tmp
+*.rar
+
+# TestNG execution files
+testng.out.xml
+testNG_allordersTCS

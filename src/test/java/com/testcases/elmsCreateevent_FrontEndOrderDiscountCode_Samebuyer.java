@@ -1,0 +1,171 @@
+package com.testcases;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+import com.base.BaseClass;
+import com.pages.createevent_frontendorder_page1;
+import com.pages.login_page;
+import com.pages.logout_page;
+import com.utility.PropertyUtils;
+
+public class elmsCreateevent_FrontEndOrderDiscountCode_Samebuyer extends BaseClass {
+
+	createevent_frontendorder_page1 cefe = null;
+	login_page lp = null;
+	logout_page logpage = null;
+
+	@BeforeSuite//(alwaysRun = true)
+	public void setup() throws Exception {
+		intialization();
+		System.out.println("webdriver intialized");
+		//System.setProperty("webdriver.chrome.silentOutput","true");////////////
+		lp = new login_page(driver);
+		log.info("************** Opening URL *****************");
+	}
+
+	@Test(priority = 1)
+	public void login() throws Exception {
+		log.info("************** Verifying Login Test *****************");
+		Thread.sleep(5000);
+		log.info("we are inside login method of createaccounts class");
+		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
+		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
+
+		lp.loginToelms(elmsadminuser, elmsadminpassword);
+		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+		log.info("after successful login page title is: " + driver.getTitle());
+	}
+
+	@Test(priority = 2)
+	public void Create_PublicOnlineEvent() throws Exception {
+
+		cefe = new createevent_frontendorder_page1(driver);
+		Thread.sleep(3000);
+		cefe.clickOnEventMenu();
+		Thread.sleep(3000);
+		//////
+
+		cefe.clickOnCreateEvent();
+		Thread.sleep(3000);
+		cefe.setYesHideFromListing();
+		cefe.setPublicEventType();
+		Thread.sleep(2000);
+		cefe.setNoTBDEvent();
+		cefe.setOnlineDeliveryType(); // cefe.setPMICTestPlatform();
+		Thread.sleep(2000);
+		cefe.setPMPIAccount();
+		String test_public_online_event_initial = PropertyUtils.readProperty("testpubliconlineevent_initial");
+
+		cefe.generateEventName(test_public_online_event_initial);
+		cefe.setEventName();
+		Thread.sleep(2000);
+		cefe.setEventTitle();
+
+		cefe.setEventStartDateTime();
+
+																														// this
+		cefe.setEventEndDateTime();
+		cefe.clickProductAndPricingSection();
+		Thread.sleep(1000);
+		cefe.addPMProducts();
+		Thread.sleep(2000);
+
+		cefe.setCourseStartDateTime();
+
+		cefe.setCourseEndDateTime();
+
+		cefe.setCourseSaleStartDate();
+		cefe.setCourseSaleEndDate();
+		cefe.setCourseMaxQty();	
+		//Thread.sleep(2000);
+		//cefe.setTemplate();
+		Thread.sleep(5000);
+		
+		
+		//cefe.saveEvent();
+		cefe.publishEvent();
+		Thread.sleep(7000);
+	}
+	
+	@Test(priority = 3)
+	public void searchEvent() throws Exception {
+		cefe.clickOnEventMenu();
+
+		Thread.sleep(2000);
+		cefe.clickOnAllEventsLink();
+		Thread.sleep(15000);
+		cefe.clearAllFilterLink();
+		Thread.sleep(10000);
+		cefe.clickOnFiltersBtn();
+		Thread.sleep(5000);
+		// cefe.setConfiguredEventNameFilter();
+		/////
+		cefe.setNewlyCreatedEventNameFilter();
+		Thread.sleep(7000);
+	}
+	
+
+	@Test(priority = 4)
+	public void placeFrontEndOrder() throws Exception {
+		cefe.launchEventPurchaseLink();
+		Thread.sleep(10000);
+		String itemqty_data = PropertyUtils.readProperty("itemqty");
+		cefe.setRegistrantItemQty(itemqty_data);
+		Thread.sleep(7000);
+		
+		cefe.selectAddtocartAndProceedToRegistration();//added these 2 lines on 28th nov 24
+		Thread.sleep(3000);
+		
+		if(itemqty_data.equals("1"))
+		{cefe.generateReg1Email();
+		cefe.setRegistrantONEInfo();
+		}
+		
+		if (itemqty_data.equals("2"))
+		{cefe.generateReg1Email();
+		cefe.setRegistrantONEInfo();
+		Thread.sleep(2000);
+		cefe.generateReg2Email();
+		cefe.setRegistrantTWOInfo();
+		Thread.sleep(2000);
+		}
+		
+		if (itemqty_data.equals("3"))
+		{cefe.generateReg1Email();
+		cefe.setRegistrantONEInfo();
+		Thread.sleep(2000);
+		cefe.generateReg2Email();
+		cefe.setRegistrantTWOInfo();
+		Thread.sleep(2000);
+		cefe.generateReg3Email();
+		cefe.setRegistrantTHREEInfo();
+		Thread.sleep(2000);
+		}
+		
+		Thread.sleep(3000);
+		cefe.applyCouponCode();
+		Thread.sleep(20000);
+		cefe.clickProceedToCheckoutBtnAfterDC();
+		Thread.sleep(5000);
+		//cefe.generateNewBillerEmail();
+		//Thread.sleep(2000);
+		//cefe.setNewBillingInfo();
+		cefe.setBillingInfo();
+		Thread.sleep(10000);
+		
+		cefe.placeOrder();
+		Thread.sleep(2000);
+	}
+
+	@AfterSuite//(priority = 5)
+	public void logout() throws Exception {
+		logpage = new logout_page(driver);
+		logpage.elmsLogoutApplication();
+	}
+
+}
