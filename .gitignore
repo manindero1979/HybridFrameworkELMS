@@ -19,7 +19,7 @@ test-output/
 *.html
 
 # Screenshots
-screenshots/
+
 
 # Temporary files
 *.tmp
