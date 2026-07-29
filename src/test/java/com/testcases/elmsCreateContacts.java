@@ -85,7 +85,7 @@ public class elmsCreateContacts extends BaseClass {
 		Thread.sleep(2000);
 
 		contactspage.clickOnSaveContact();
-		Assert.assertTrue(false, "Intentional failure to verify screenshot capture");
+		
 		Thread.sleep(5000);
 
 		
