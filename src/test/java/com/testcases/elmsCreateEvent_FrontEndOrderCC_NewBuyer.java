@@ -66,6 +66,7 @@ public class elmsCreateEvent_FrontEndOrderCC_NewBuyer extends BaseClass {
 		cefe.setEventStartDateTime();																			// this
 		cefe.setEventEndDateTime();
 		//Thread.sleep(3000);
+		
 		cefe.clickProductAndPricingSection();
 		cefe.addPMProducts();
 		cefe.setCourseStartDateTime();

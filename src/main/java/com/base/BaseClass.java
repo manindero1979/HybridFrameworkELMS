@@ -1,12 +1,16 @@
 package com.base;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
@@ -88,6 +92,14 @@ public class BaseClass {
 		driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 		driver.get(PropertyUtils.readProperty("pmicurl"));
 		}
+	
+	public void waitForLoaderToDisappear() {
+
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+
+	    wait.until(ExpectedConditions.invisibilityOfElementLocated(
+	            By.cssSelector("div.loading-mask")));
+	}
 	
 	public void intializationpsp() throws Exception {
 		String brow_name = PropertyUtils.readProperty("browser");

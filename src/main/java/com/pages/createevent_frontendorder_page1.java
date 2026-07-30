@@ -63,21 +63,15 @@ public class createevent_frontendorder_page1 extends BaseClass {
 	// Calendar cal = Calendar.getInstance();
 	SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
 
-	
+	private WebDriver driver;
 	private WebDriverWait wait;
 	// constructor
 	public createevent_frontendorder_page1(WebDriver driver) {
-		
-		
-		
-		this.driver = driver;
-		//wait = new WebDriverWait(driver, 40, 40);
-		WebDriverWait wait = new WebDriverWait(
-		        driver,
-		        Duration.ofSeconds(40)
-		);
-		//wait = new WebDriverWait(driver, Duration.ofSeconds(40)); 
-		PageFactory.initElements(driver, this);
+
+	    this.driver = driver;
+	    this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+
+	    PageFactory.initElements(driver, this);
 	}
 
 	// javascript for scrolling
@@ -418,7 +412,11 @@ public class createevent_frontendorder_page1 extends BaseClass {
 	private WebElement btn_add_product;
 
 	public void clickProductAndPricingSection() throws Exception {
-		section_products_and_pricing.click();
+		waitForLoaderToDisappear();
+
+		wait.until(ExpectedConditions.elementToBeClickable(section_products_and_pricing))
+		    .click();
+		//section_products_and_pricing.click();
 		log.info("clicked Products & Pricing section");
 		Thread.sleep(2000);
 	}
@@ -474,11 +472,20 @@ public class createevent_frontendorder_page1 extends BaseClass {
 	private WebElement course_sale_end_date;
 
 	public void setCourseSaleStartDate() {
-		Calendar cal = Calendar.getInstance();
-		String salestartdate = sdf.format(cal.getTime());
-		coursesalestartdate = salestartdate + " 12:00 AM";
-		course_sale_start_date.sendKeys(coursesalestartdate);
-		log.info("set course sale start date is: " + coursesalestartdate);
+
+	    Calendar cal = Calendar.getInstance();
+
+	    // Set date to yesterday
+	    cal.add(Calendar.DAY_OF_MONTH, -1);
+
+	    String saleStartDate = sdf.format(cal.getTime());
+
+	    coursesalestartdate = saleStartDate + " 12:00 AM";
+
+	    course_sale_start_date.clear();
+	    course_sale_start_date.sendKeys(coursesalestartdate);
+
+	    log.info("Set course sale start date is: " + coursesalestartdate);
 	}
 
 	public void setCourseSaleEndDate() {
@@ -1646,8 +1653,9 @@ public class createevent_frontendorder_page1 extends BaseClass {
 		 // ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();",
 		 // btn_placeorder);
 		  
-		  
-		  btn_placeorder.click();
+		    waitForLoaderToDisappear();
+		    wait.until(ExpectedConditions.elementToBeClickable(btn_placeorder)).click();
+		 // btn_placeorder.click();
 		 
 		log.info("PLACE ORDER button clicked");
 		Thread.sleep(20000);
