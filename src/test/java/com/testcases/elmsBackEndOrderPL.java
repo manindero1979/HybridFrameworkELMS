@@ -82,8 +82,8 @@ public class elmsBackEndOrderPL extends BaseClass {
 		Thread.sleep(4000);
 		beo.saveRegistrant();
 		Thread.sleep(4000);
-		beo.setFreeShipping();
-		Thread.sleep(3000);
+		//beo.setFreeShipping();
+		//Thread.sleep(3000);
 		beo.setPaylaterPaymentoption();
 		Thread.sleep(4000);
 		beo.order_submit();

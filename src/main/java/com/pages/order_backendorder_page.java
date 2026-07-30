@@ -450,6 +450,7 @@ public class order_backendorder_page extends BaseClass {
 	private WebElement btn_add_registrants;
 
 	public void clicOnAddRegistrantsBtn() {
+		waitForLoaderToDisappear();
 		wait.until(ExpectedConditions.elementToBeClickable(btn_add_registrants)).click();
 		/*
 		 * WebDriverWait wait = new WebDriverWait(driver, 10); WebElement element =
@@ -651,7 +652,16 @@ public class order_backendorder_page extends BaseClass {
 		 * 20).until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click
 		 * ();
 		 */
-		wait.until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click();
+		waitForLoaderToDisappear();
+
+		wait.until(ExpectedConditions.visibilityOf(radio_free_shipping));
+
+		wait.until(ExpectedConditions.elementToBeClickable(radio_free_shipping));
+
+		radio_free_shipping.click();
+
+		
+		//wait.until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click();
 		log.info("selected free shipping");
 
 	}
