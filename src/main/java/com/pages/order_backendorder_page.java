@@ -859,7 +859,7 @@ public class order_backendorder_page extends BaseClass {
 
 	    try {
 
-	        if (driver.findElements(By.xpath("//your-xpath-for-clearall")).size() > 0) {
+	        if (driver.findElements(By.xpath("//div[@class='data-grid-filters-actions-wrap']//following-sibling::div[@class='admin__data-grid-filters-current _show']//button[text()='Clear all']")).size() > 0) {
 
 	            link_clearallorder.click();
 	            log.info("Clicked on Clear All.");
