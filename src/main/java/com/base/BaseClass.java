@@ -2,11 +2,13 @@ package com.base;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -93,12 +95,24 @@ public class BaseClass {
 		driver.get(PropertyUtils.readProperty("pmicurl"));
 		}
 	
-	public void waitForLoaderToDisappear() {
+	public void waitForLoaderToDisappear_old() {
 
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
 
 	    wait.until(ExpectedConditions.invisibilityOfElementLocated(
 	            By.cssSelector("div.loading-mask")));
+	}
+	public void waitForLoaderToDisappear() {
+
+	    By loader = By.cssSelector("div.loading-mask");
+
+	    List<WebElement> loaders = driver.findElements(loader);
+
+	    if (!loaders.isEmpty()) {
+
+	        new WebDriverWait(driver, Duration.ofSeconds(15))
+	                .until(ExpectedConditions.invisibilityOfElementLocated(loader));
+	    }
 	}
 	
 	public void intializationpsp() throws Exception {

@@ -16,6 +16,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -846,27 +847,29 @@ public class order_backendorder_page extends BaseClass {
 
 	@FindBy(xpath = "//td[@class='processing']//a[text()='View']")
 	private WebElement link_order_view;
-
 	public void clearAllOrderFilterLink() {
-		
-		log.info("i m insode clearAllOrderFilterLink method");
-		try // add this try-catch so tht if elemtn not displayed then ELSE condition will
-			// work
-		{// if (wait.until(ExpectedConditions.visibilityOf(link_clearall)) != null) {
 
-			if (link_clearallorder.isDisplayed()) {
-				link_clearallorder.click();
-				log.info("Order-CLEARALL link visible and clikced");
-				Thread.sleep(7000);
-			}
-		} catch (Exception e)
+	    log.info("Inside clearAllOrderFilterLink()");
 
-		{
-			log.info("clearall link not visible");
-		}
+	    try {
 
+	        if (driver.findElements(By.xpath("//your-xpath-for-clearall")).size() > 0) {
+
+	            link_clearallorder.click();
+	            log.info("Clicked on Clear All.");
+
+	            waitForLoaderToDisappear();
+
+	        } else {
+
+	            log.info("Clear All link is not present.");
+	        }
+
+	    } catch (Exception e) {
+
+	        log.error("Exception while clicking Clear All.", e);
+	    }
 	}
-
 	public void clickOnOrderFiltersBtn() {
 		
 		log.info("i m inside clickOnOrderFiltersBtn method");
@@ -909,6 +912,11 @@ public class order_backendorder_page extends BaseClass {
 
 		//wait.until(ExpectedConditions.elementToBeClickable(cust_email_filter)).sendKeys(searchexistingcustomer_data);
 		// cust_email_filter.sendKeys(existingregistrant_emailid_data);
+		
+		waitForLoaderToDisappear();
+		wait.until(ExpectedConditions.visibilityOf(cust_email_filter));
+
+		wait.until(ExpectedConditions.elementToBeClickable(cust_email_filter));
 		cust_email_filter.clear();
 
 		wait.until(ExpectedConditions.elementToBeClickable(cust_email_filter)).sendKeys(searchexistingcustomer_data);
