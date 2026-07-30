@@ -9,7 +9,7 @@
 
     <test name="Test" thread-count="5">
         <classes>
-            <class name="com.testcases.elmsCreateEvent_FrontEndOrderCC_NewBuyer"/>
+            <class name="com.testcases.elmsBackEndOrderPL"/>
         </classes>
     </test>
 
