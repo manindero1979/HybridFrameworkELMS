@@ -9,7 +9,7 @@
 
     <test name="Test" thread-count="5">
         <classes>
-            <class name="com.testcases.elmsCancel_ExistingOrder"/>
+            <class name="com.testcases.elmsBackEndOrderPL"/>
         </classes>
     </test>
 

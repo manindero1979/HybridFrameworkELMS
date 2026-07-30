@@ -789,30 +789,36 @@ public class order_backendorder_page extends BaseClass {
 	@FindBy(xpath = "//div[@class='page-title-wrapper']//h1")
 	private WebElement order_id_label;
 
-	public void order_submit() throws Exception {
-		log.info(" i m inside order_submit method");
-		JavascriptExecutor jse = (JavascriptExecutor) driver;
-		jse.executeScript("arguments[0].click()", btn_submit_order);
+	public void order_submit() {
 
-		// btn_submit_order.click();
-		log.info("order submitted");
-		Thread.sleep(5000);
-		// ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();",
-		// order_id_label);
-		// orderid = new WebDriverWait(driver,
-		// 50).until(ExpectedConditions.visibilityOf(order_id_label)).getText();
-		orderid = wait.until(ExpectedConditions.elementToBeClickable(order_id_label)).getText();
-		log.info(" order generated is: " + orderid);
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/backendordercreated-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-		// Thread.sleep(3000);
+	    log.info("Inside order_submit()");
 
+	    waitForLoaderToDisappear();
+
+	    wait.until(ExpectedConditions.elementToBeClickable(btn_submit_order))
+	        .click();
+
+	    log.info("Clicked Submit Order");
+
+	    waitForLoaderToDisappear();
+
+	    orderid = wait.until(
+	            ExpectedConditions.visibilityOf(order_id_label))
+	            .getText();
+
+	    log.info("Order generated is: " + orderid);
+
+	    File screenshot = ((TakesScreenshot) driver)
+	            .getScreenshotAs(OutputType.FILE);
+
+	    try {
+	        FileUtils.copyFile(
+	                screenshot,
+	                new File("target/screenshots/backendordercreated-" + orderid + ".jpg"));
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 	}
-
 	public void feeOrderSubmit() throws Exception {
 		btn_submit_order.click();
 		log.info("order submitted");
