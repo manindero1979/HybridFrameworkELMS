@@ -9,7 +9,7 @@
 
     <test name="Test" thread-count="5">
         <classes>
-            <class name="com.testcases.Create_PublicOnlineEvent"/>
+            <class name="com.testcases.elmsCreatePublicOnlineEvent"/>
         </classes>
     </test>
 
