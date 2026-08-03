@@ -9,7 +9,7 @@
 
     <test name="Test" thread-count="5">
         <classes>
-            <class name="com.testcases.EndtoEndPMICCourseExamFlow"/>
+            <class name="com.testcases.Create_PublicOnlineEvent"/>
         </classes>
     </test>
 
