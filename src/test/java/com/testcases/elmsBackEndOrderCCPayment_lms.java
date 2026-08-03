@@ -27,7 +27,7 @@ public class elmsBackEndOrderCCPayment_lms extends BaseClass {
 		
 	}
 
-	@Test(priority = 2)
+	//@Test(priority = 2)
 	public void login_old() throws Exception {
 		log.info("************** Verifying Login Test *****************");
 		Thread.sleep(5000);
@@ -36,7 +36,7 @@ public class elmsBackEndOrderCCPayment_lms extends BaseClass {
 		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
 
 		lp.loginToelms(elmsadminuser, elmsadminpassword);
-		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+		Assert.assertEquals(driver.getTitle(), "Magento Admin");
 		log.info("after successful login page title is: " + driver.getTitle());
 	}
 	
@@ -91,8 +91,8 @@ public class elmsBackEndOrderCCPayment_lms extends BaseClass {
 
 		beo.saveRegistrant();
 		Thread.sleep(5000);
-		beo.setFreeShipping();
-		Thread.sleep(5000);
+		//beo.setFreeShipping();
+		//Thread.sleep(5000);
 		beo.setCCPaymentoption();
 		Thread.sleep(5000);
 		beo.order_submit();

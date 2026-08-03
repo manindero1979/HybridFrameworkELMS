@@ -12,22 +12,27 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 
 import com.base.BaseClass;
+import com.utility.DriverUtils;
 import com.utility.PropertyUtils;
 
 public class order_backendorder_page extends BaseClass {
@@ -366,7 +371,8 @@ public class order_backendorder_page extends BaseClass {
 		log.info("OK button clicked");
 	}
 
-	@FindBy(xpath = "//input[@id='id_1752']")
+	//@FindBy(xpath = "//label[@for='id_1752']")
+	@FindBy(xpath = "//tr[.//td[contains(@class,'col-name')][contains(.,'Testing Fee')]]//td[contains(@class,'col-name')]")
 	private WebElement chkbox_testing_fee;
 
 	public void selectTestingFees() {
@@ -374,22 +380,21 @@ public class order_backendorder_page extends BaseClass {
 		log.info("selected Testing fee option");
 	}
 
-	public void clickAddSelectedProductToOrderBtn() throws Exception {
+	public void clickAddSelectedProductToOrderBtn() {
 
-		//WebDriverWait wait1 = new WebDriverWait(driver, 30);
-		WebDriverWait wait = new WebDriverWait(
-		        driver,
-		        Duration.ofSeconds(30)
-		);
-		WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(30)); 
-		WebElement element1 = wait1.until(ExpectedConditions.elementToBeClickable(btn_add_selected_product_to_order));
-		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element1);
-		Thread.sleep(5000);// added on 31st jan 23
-		// wait.until(ExpectedConditions.elementToBeClickable(btn_add_selected_product_to_order)).click();//--this
-		// didnt work here
-		log.info("'ADD SELECTED PRODUCTs TO ORDER' button clicked");
+	    log.info("Inside clickAddSelectedProductToOrderBtn");
+
+	    waitForLoaderToDisappear();
+
+	    WebElement button = wait.until(
+	            ExpectedConditions.elementToBeClickable(btn_add_selected_product_to_order));
+
+	    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+
+	    log.info("'ADD SELECTED PRODUCT(S) TO ORDER' button clicked");
+
+	   
 	}
-
 	@FindBy(xpath = "//td[@class='col-price']//input[@class='admin__control-checkbox']")
 	private WebElement chkbox_adjust_price;
 
@@ -442,27 +447,80 @@ public class order_backendorder_page extends BaseClass {
 	}
 
 	public void clickUpdateItemsAndQtyBtn() {
-		wait.until(ExpectedConditions.elementToBeClickable(btn_update_items_and_quantities)).click();
-		// btn_update_items_and_quantities.click();
-		log.info("UPDATE ITEMS AND QUANTITY button clicked");
+
+	    log.info("Inside clickUpdateItemsAndQtyBtn");
+
+	    for (int i = 1; i <= 3; i++) {
+
+	        try {
+
+	            waitForLoaderToDisappear();
+
+	            WebElement button = wait.until(
+	                    ExpectedConditions.elementToBeClickable(btn_update_items_and_quantities));
+
+	            ((JavascriptExecutor) driver)
+	                    .executeScript("arguments[0].scrollIntoView({block:'center'});", button);
+
+	            button.click();
+
+	            waitForLoaderToDisappear();
+
+	            log.info("UPDATE ITEMS AND QUANTITY button clicked");
+
+	            return;
+
+	        } catch (ElementClickInterceptedException e) {
+
+	            log.info("Loader intercepted click. Retry: " + i);
+
+	            waitForLoaderToDisappear();
+
+	        } catch (StaleElementReferenceException e) {
+
+	            log.info("Button became stale. Retry: " + i);
+	        }
+	    }
+
+	    throw new RuntimeException("Unable to click Update Items and Quantities button.");
 	}
 
 	@FindBy(xpath = "//button[@id='add_registant']")
 	private WebElement btn_add_registrants;
 
 	public void clicOnAddRegistrantsBtn() {
-		waitForLoaderToDisappear();
-		wait.until(ExpectedConditions.elementToBeClickable(btn_add_registrants)).click();
-		/*
-		 * WebDriverWait wait = new WebDriverWait(driver, 10); WebElement element =
-		 * wait.until(ExpectedConditions.elementToBeClickable(btn_add_registrants));
-		 * ((JavascriptExecutor) driver).executeScript("arguments[0].click();",
-		 * element);
-		 */
-		log.info("ADD REGISTRANTS button clicked");
 
+	    log.info("Inside clicOnAddRegistrantsBtn()");
+
+	    for (int i = 0; i < 3; i++) {
+
+	        try {
+
+	            waitForLoaderToDisappear();
+
+	            WebElement button = wait.until(
+	                    ExpectedConditions.visibilityOf(btn_add_registrants));
+
+	            ((JavascriptExecutor) driver)
+	                    .executeScript("arguments[0].scrollIntoView({block:'center'});", button);
+
+	            wait.until(ExpectedConditions.elementToBeClickable(button));
+
+	            button.click();
+
+	            log.info("ADD REGISTRANTS button clicked");
+
+	            return;
+
+	        } catch (ElementClickInterceptedException e) {
+
+	            log.info("Loading mask intercepted click. Retrying...");
+	            waitForLoaderToDisappear();
+	        }
+	    }
+
+	    throw new RuntimeException("Unable to click Add Registrants button.");
 	}
-
 	// new registrant fields
 	@FindBy(xpath = "//div[text()='Registrant - 1 of 3']//parent::div//child::input[@class='admin__control-text contactemail required-entry']")
 	private WebElement new_registrant1_email_address;
@@ -667,26 +725,33 @@ public class order_backendorder_page extends BaseClass {
 
 	}
 
-	public void setFreeShippingForEditOrder() throws Exception {
+	public void setFreeShippingForEditOrder() {
 
-		/*
-		 * JavascriptExecutor jse = (JavascriptExecutor) driver;
-		 * jse.executeScript("arguments[0].click()",
-		 * section_payment_and_shipping_header);
-		 * 
-		 * ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();",
-		 * section_payment_and_shipping_header);
-		 */
+	    log.info("Inside setFreeShippingForEditOrder");
 
-		/*
-		 * new WebDriverWait(driver,
-		 * 20).until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click
-		 * ();
-		 */
-		wait.until(ExpectedConditions.elementToBeClickable(section_payment_and_shipping_header)).click();
-		wait.until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click();
-		log.info("selected free shipping");
-		Thread.sleep(2000);
+	    waitForLoaderToDisappear();
+
+	    By paymentSection =
+	        By.xpath("//*[contains(normalize-space(),'Payment & Shipping Information')]");
+
+	    if (driver.findElements(paymentSection).size() > 0) {
+
+	        WebElement section = wait.until(
+	                ExpectedConditions.visibilityOfElementLocated(paymentSection));
+
+	        ((JavascriptExecutor) driver)
+	                .executeScript("arguments[0].scrollIntoView({block:'center'});", section);
+
+	        section.click();
+
+	        waitForLoaderToDisappear();
+	    }
+
+	    wait.until(ExpectedConditions.elementToBeClickable(radio_free_shipping)).click();
+
+	    log.info("Free Shipping selected");
+
+	    waitForLoaderToDisappear();
 	}
 
 	@FindBy(xpath = "//input[@value='internalpayment']")
@@ -752,28 +817,51 @@ public class order_backendorder_page extends BaseClass {
 	@FindBy(xpath = "//input[@title='Invoice Request']")
 	private WebElement chkbox_invoicerequest;
 
-	public void setPaylaterPaymentoption() throws Exception {
-		log.info("i m inside setPaylaterPaymentoption method ");
-		/*
-		 * ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();",
-		 * section_payment_and_shipping_header); new WebDriverWait(driver,
-		 * 30).until(ExpectedConditions.elementToBeClickable(radio_paylater_payment)).
-		 * click(); Thread.sleep(2000);
-		 */
-		wait.until(ExpectedConditions.elementToBeClickable(radio_paylater_payment)).click();
-		Thread.sleep(2000);
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.DATE, 1); // select tomorows date
-		String dt = sdf.format(c.getTime());
+	@FindBy(xpath = "//label[@for='p_method_paylater']")
+	private WebElement lbl_paylater_payment;
+	
+	public void setPaylaterPaymentoption() {
 
-		add_due_date.sendKeys(dt);
-		add_due_date.sendKeys(Keys.TAB);// this will click outside the due date field
-		Thread.sleep(1000);
-		log.info("selected PAY LATER method and added tomorows date as DUE DATE ");
-		chkbox_invoicerequest.click();
-		Thread.sleep(2000);
+	    log.info("Inside setPaylaterPaymentoption()");
 
+	    waitForLoaderToDisappear();
+
+	    wait.until(ExpectedConditions.elementToBeClickable(lbl_paylater_payment))
+	            .click();
+
+	    log.info("Pay Later selected");
+
+	    waitForLoaderToDisappear();
+
+	    Calendar c = Calendar.getInstance();
+	    c.add(Calendar.DATE, 1);
+	    String dt = sdf.format(c.getTime());
+
+	    WebElement dueDate = wait.until(
+	            ExpectedConditions.visibilityOf(add_due_date));
+
+	    dueDate.clear();
+	    dueDate.sendKeys(dt);
+	    dueDate.sendKeys(Keys.TAB);
+
+	    log.info("Due date entered");
+
+	    // IMPORTANT
+	    waitForLoaderToDisappear();
+
+	    WebElement invoice = wait.until(
+	            ExpectedConditions.elementToBeClickable(chkbox_invoicerequest));
+
+	    ((JavascriptExecutor)driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", invoice);
+
+	    invoice.click();
+
+	    log.info("Invoice Request selected");
+
+	    waitForLoaderToDisappear();
 	}
+	
 	
 	@FindBy(xpath = "//textarea[@id='order-comment']")
 	private WebElement order_comment;
@@ -789,36 +877,93 @@ public class order_backendorder_page extends BaseClass {
 	@FindBy(xpath = "//div[@class='page-title-wrapper']//h1")
 	private WebElement order_id_label;
 
-	public void order_submit() {
+	public void order_submit() throws InterruptedException {
 
-	    log.info("Inside order_submit()");
+	    log.info("========== Inside order_submit() ==========");
 
+	    // Wait for any previous Ajax requests to complete
 	    waitForLoaderToDisappear();
 
-	    wait.until(ExpectedConditions.elementToBeClickable(btn_submit_order))
-	        .click();
+	    // Locate Submit Order button
+	    WebElement submitBtn = wait.until(
+	            ExpectedConditions.elementToBeClickable(btn_submit_order));
 
-	    log.info("Clicked Submit Order");
+	    ((JavascriptExecutor) driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", submitBtn);
 
-	    waitForLoaderToDisappear();
-
-	    orderid = wait.until(
-	            ExpectedConditions.visibilityOf(order_id_label))
-	            .getText();
-
-	    log.info("Order generated is: " + orderid);
-
-	    File screenshot = ((TakesScreenshot) driver)
-	            .getScreenshotAs(OutputType.FILE);
+	    log.info("Submit button is visible and clickable");
+	    log.info("Button Enabled : " + submitBtn.isEnabled());
+	    log.info("Button Class   : " + submitBtn.getAttribute("class"));
+	    log.info("Button Disabled Attribute : " + submitBtn.getAttribute("disabled"));
 
 	    try {
-	        FileUtils.copyFile(
-	                screenshot,
-	                new File("target/screenshots/backendordercreated-" + orderid + ".jpg"));
-	    } catch (IOException e) {
-	        e.printStackTrace();
+
+	        // Try normal click
+	    	Actions actions = new Actions(driver);
+
+	    	actions.moveToElement(submitBtn)
+	    	       .pause(Duration.ofSeconds(1))
+	    	       .click()
+	    	       .perform();
+
+	    	log.info("Action click performed");
+	        log.info("Normal click executed");
+
+	    } catch (Exception e) {
+
+	        log.info("Normal click failed : " + e.getMessage());
+	        log.info("Trying JavaScript click...");
+
+	        ((JavascriptExecutor) driver)
+	                .executeScript("arguments[0].click();", submitBtn);
+
+	        log.info("JavaScript click executed");
 	    }
+
+	    // Give Magento some time to start processing
+	    Thread.sleep(3000);
+
+	    log.info("Current URL after click : " + driver.getCurrentUrl());
+
+	    // Check whether page is still on Create Order page
+	    if (driver.getCurrentUrl().contains("sales/order_create")) {
+
+	        log.info("Order NOT submitted. Looking for validation errors...");
+
+	        List<WebElement> errors = driver.findElements(
+	                By.cssSelector(".mage-error, .message-error, .admin__field-error"));
+
+	        log.info("Validation Errors Found : " + errors.size());
+
+	        for (WebElement error : errors) {
+
+	            if (!error.getText().trim().isEmpty()) {
+	                log.info("ERROR : " + error.getText());
+	            }
+	        }
+
+	        DriverUtils.getScreenshot("SubmitOrder_Failed");
+
+	        Assert.fail("Submit Order failed. Page did not navigate to Order View.");
+	    }
+
+	    // Wait for loader after successful submit
+	    waitForLoaderToDisappear();
+
+	    // Wait for Order View page
+	    wait.until(ExpectedConditions.urlContains("sales/order/view"));
+
+	    log.info("Order submitted successfully.");
+	    log.info("Current URL : " + driver.getCurrentUrl());
+
+	    orderid = wait.until(ExpectedConditions.visibilityOf(order_id_label))
+	                  .getText();
+
+	    log.info("Generated Order ID : " + orderid);
+
+	    DriverUtils.getScreenshot("backendordercreated_" + orderid);
 	}
+	
 	public void feeOrderSubmit() throws Exception {
 		btn_submit_order.click();
 		log.info("order submitted");
@@ -829,12 +974,14 @@ public class order_backendorder_page extends BaseClass {
 		 */
 		orderid = wait.until(ExpectedConditions.elementToBeClickable(order_id_label)).getText();
 		log.info(" order generated is: " + orderid);
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot, new File("target/screenshots/feeordercreated-" + orderid + ".jpg"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("Feeordercreated_" + orderid);
+	    
 		// Thread.sleep(3000);
 
 	}
@@ -1105,13 +1252,14 @@ public class order_backendorder_page extends BaseClass {
 	private WebElement order_status;
 
 	public void confirmOrderRefund() {
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot,
 					new File("target/screenshots/orederrefund-" + existingorderid_data + ".jpg"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("order_refund_" + orderid);
 
 		softAssert.assertEquals(msg_order_success.getText(), "You created the credit memo.");
 		log.info("Order refund successfull");
@@ -1176,12 +1324,13 @@ public class order_backendorder_page extends BaseClass {
 	}
 
 	public void confirmOrderCancel() {
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot, new File("target/screenshots/oredercancel.jpg"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("cancel_order_" + orderid);
 
 		softAssert.assertEquals(msg_order_success.getText(), "You canceled the order.");
 		log.info("Order cancellation successfull");
@@ -1206,41 +1355,120 @@ public class order_backendorder_page extends BaseClass {
 	
 	
 	//div[@class='modals-wrapper'//
+	public void clickEditOrderLink() {
 
-	public void clickEditOrderLink() throws Exception {
-		try // add this try-catch so tht if elemtn not displayed then ELSE condition will
-		// work
-		{
-			if (btn_order_edit.isDisplayed()) {
-				log.info("EDIT ORDER link enabled");
-				btn_order_edit.click();
-				log.info("EDIT ORDER link clicked");
-				Thread.sleep(5000);
-				
-				/*Alert alert = driver.switchTo().alert(); // switch to alert
+	    log.info("========== Inside clickEditOrderLink() ==========");
 
-				String alertMessage= driver.switchTo().alert().getText(); // capture alert message
-				
-				log.info("alert msg is:"+alertMessage);*/
-				
-				try // add this try-catch so tht if elemtn not displayed then ELSE condition will
-					// work
-				{
-					if ((msg_order_edit_confirm).isEnabled()) {
-						log.info("ORDER edit confirmation msg is: " + msg_order_edit_confirm.getText());
-						btn_order_edit_ok.click();
-						log.info("Edit order confirmed");
-					}
-				} catch (Exception e) {
-					log.info("Edit Order confirmaiton msg didnt display");
-				}
-			}
-		}
+	    waitForLoaderToDisappear();
 
-		catch (Exception e) {
-			log.info("EDIT ORDER link not visible");
-		}
+	    // Click Edit button
+	    WebElement editButton = wait.until(
+	            ExpectedConditions.elementToBeClickable(btn_order_edit));
 
+	    ((JavascriptExecutor) driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", editButton);
+
+	    editButton.click();
+
+	    log.info("Edit button clicked");
+
+	    // Wait until popup appears
+	    By popup = By.xpath("//aside[contains(@class,'modal-popup') and contains(@class,'_show')]");
+
+	    wait.until(ExpectedConditions.visibilityOfElementLocated(popup));
+
+	    log.info("Edit Order popup displayed");
+
+	    waitForLoaderToDisappear();
+
+	    // Locate OK button dynamically
+	    By okButtonBy = By.xpath(
+	            "//aside[contains(@class,'_show')]//button[contains(@class,'action-primary')]");
+
+	    WebElement okButton = wait.until(
+	            ExpectedConditions.visibilityOfElementLocated(okButtonBy));
+
+	    ((JavascriptExecutor) driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", okButton);
+
+	    log.info("OK Button Displayed : " + okButton.isDisplayed());
+	    log.info("OK Button Enabled   : " + okButton.isEnabled());
+	    log.info("OK Button Class     : " + okButton.getAttribute("class"));
+	    log.info("OK Button Disabled  : " + okButton.getAttribute("disabled"));
+
+	    // Wait until button becomes enabled
+	    wait.until(driver -> okButton.isEnabled());
+
+	    try {
+
+	        wait.until(ExpectedConditions.elementToBeClickable(okButton));
+
+	        okButton.click();
+
+	        log.info("Normal click on OK button successful.");
+
+	    } catch (Exception e) {
+
+	        log.info("Normal click failed : " + e.getMessage());
+
+	        try {
+
+	            new Actions(driver)
+	                    .moveToElement(okButton)
+	                    .pause(Duration.ofSeconds(1))
+	                    .click()
+	                    .perform();
+
+	            log.info("Actions click successful.");
+
+	        } catch (Exception ex) {
+
+	            log.info("Actions click failed : " + ex.getMessage());
+
+	            ((JavascriptExecutor) driver).executeScript(
+	                    "arguments[0].dispatchEvent(new MouseEvent('click',{bubbles:true}));",
+	                    okButton);
+
+	            log.info("JavaScript MouseEvent click executed.");
+	        }
+	    }
+
+	    waitForLoaderToDisappear();
+
+	    log.info("Current URL : " + driver.getCurrentUrl());
+
+	    DriverUtils.getScreenshot("After_Edit_OK_Click");
+	}
+	public void clickEditOrderLink_old() {
+
+	    log.info("Inside clickEditOrderLink()");
+
+	    waitForLoaderToDisappear();
+
+	    wait.until(ExpectedConditions.elementToBeClickable(btn_order_edit)).click();
+	    log.info("Edit button clicked");
+
+	    // Wait until confirmation popup appears
+	    wait.until(ExpectedConditions.visibilityOfElementLocated(
+	            By.xpath("//span[contains(text(),'Are you sure')]")));
+
+	    log.info("Confirmation popup displayed");
+
+	    waitForLoaderToDisappear();
+
+	    By okButtonBy = By.xpath("//button[.//span[text()='OK']]");
+
+	    WebElement okButton = wait.until(
+	            ExpectedConditions.elementToBeClickable(okButtonBy));
+
+	    ((JavascriptExecutor)driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", okButton);
+
+	    okButton.click();
+
+	    log.info("OK button clicked");
+
+	    waitForLoaderToDisappear();
 	}
 
 	@FindBy(xpath = "//input[contains(@name,'[qty]')]")
@@ -1274,8 +1502,22 @@ public class order_backendorder_page extends BaseClass {
 	}
 
 	public void clickRegistrantsSection() {
-		log.info("i m inside clickRegistrantsSection method");
-		section_registrants.click();
+
+	    log.info("Inside clickRegistrantsSection");
+
+	    waitForLoaderToDisappear();
+
+	    WebElement element = wait.until(
+	            ExpectedConditions.visibilityOf(section_registrants));
+
+	    ((JavascriptExecutor) driver).executeScript(
+	            "arguments[0].scrollIntoView({block:'center'});",
+	            element);
+
+	    waitForLoaderToDisappear();
+
+	    ((JavascriptExecutor) driver).executeScript(
+	            "arguments[0].click();", element);
 
 	}
 
@@ -1311,23 +1553,25 @@ public class order_backendorder_page extends BaseClass {
 		 */
 		orderid = wait.until(ExpectedConditions.elementToBeClickable(order_id_label)).getText();
 		log.info(" order edited is: " + orderid);
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+	/*	File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot, new File("target/screenshots/orderedited.jpg"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("order_update_" + orderid);
 		// Thread.sleep(3000);
 
 	}
 
 	public void confirmOrderEdit() {
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot, new File("target/screenshots/orederrefund.jpg"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("order_refund_" + orderid);
 
 		softAssert.assertEquals(msg_order_success.getText(), "You created the credit memo.");
 		log.info("Order refund successfull");
@@ -1392,13 +1636,14 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftercustomerfnameUPDATE.jpg"));
 			log.info("ADDRESS INFO section screenshot captured to check updated info");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("account_update_" + orderid);
 
 		/*
 		 * JavascriptExecutor jse = (JavascriptExecutor)driver;
@@ -1427,13 +1672,14 @@ public class order_backendorder_page extends BaseClass {
 		log.info("I am back in order list page");
 		js.executeScript("scroll(0, 210);");
 
-		File screenshot1 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		/*File screenshot1 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot1, new File("target/screenshots/OrderGridAfterCustomerfnameUpdate.jpg"));
 			log.info("ORDER GRID screenshot captured");
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		}
+		}*/
+	    DriverUtils.getScreenshot("customer_update_" + orderid);
 
 		if (fnameshiptobilltoname.getText().equals("customernewfname lname"))
 			log.info("updated customer firstname visible in order grid");
@@ -1455,13 +1701,7 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftercustomerlnameUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	    DriverUtils.getScreenshot("update_customer_" + orderid);
 
 		/*
 		 * JavascriptExecutor jse = (JavascriptExecutor)driver;
@@ -1473,13 +1713,7 @@ public class order_backendorder_page extends BaseClass {
 
 		log.info("ADDRESS INFO  section twisty opened");
 		Thread.sleep(1000);
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/AddressInfoAftercustomerlnameUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	    DriverUtils.getScreenshot("address_post_customer_update_" + orderid);
 		log.info("lastname displaying in Adress info section is: " + lname_addressinfocustomername.getText());
 		Thread.sleep(1000);
 		link_back.click();
@@ -1489,13 +1723,7 @@ public class order_backendorder_page extends BaseClass {
 		log.info("I am back in order list page");
 		js.executeScript("scroll(0, 210);");
 
-		File screenshot1 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot1, new File("target/screenshots/OrderGridAfterCustomerlnameUpdate.jpg"));
-			log.info("ORDER GRID screenshot captured");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	    DriverUtils.getScreenshot("order_grid_post_customer_update_" + orderid);
 
 		if (lnameshiptobilltoname.getText().equals("flipickbiller customernewlname"))
 			log.info("updated customer lastname visible in order grid");
@@ -1517,25 +1745,14 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftercustomeremailUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+	    DriverUtils.getScreenshot("account_update_post_customer_update_" + orderid);
 
 		driver.navigate().refresh();
 		log.info("order details page is refreshed");
 		Thread.sleep(3000);
 
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot,
-					new File("target/screenshots/RelaunchedFrontEndOrderDetails-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		  DriverUtils.getScreenshot("relaunched_feorder_details_" + orderid);
+
 
 		log.info("After page refresh, Customer email id displaying is: " + customeremail.getAttribute("value"));
 
@@ -1565,14 +1782,8 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2,
-					new File("target/screenshots/AccountInfoAftercustomerfnamelnameemailUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		  DriverUtils.getScreenshot("account_info_post_customerfnamelname_update_" + orderid);
+
 
 		Thread.sleep(2000);
 
@@ -1581,14 +1792,8 @@ public class order_backendorder_page extends BaseClass {
 
 		log.info("ADDRESS INFO  section twisty opened");
 		Thread.sleep(1000);
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot,
-					new File("target/screenshots/AddressInfoAftercustomerfnamelnameemailUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		  DriverUtils.getScreenshot("account_info_post_customefnamelname_update_" + orderid);
+
 		log.info("firstname and lastname displaying in Adress info section is: "
 				+ fnamelname_addressinfocustomername.getText());
 
@@ -1618,13 +1823,7 @@ public class order_backendorder_page extends BaseClass {
 		log.info("I am back in order list page");
 		js.executeScript("scroll(0, 210);");
 
-		File screenshot1 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot1, new File("target/screenshots/OrderGridAfterCustomerlnameUpdate.jpg"));
-			log.info("ORDER GRID screenshot captured");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("order_grid_post_customefnamelname_update_" + orderid);
 
 		if (lnameshiptobilltoname.getText().equals("customernewfname customernewlname"))
 			log.info("updated customer firstname and lastname visible in order grid");
@@ -1648,25 +1847,13 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftermasteraccountUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("account_info_post_masteracc_update_" + orderid);
 
 		driver.navigate().refresh();
 		log.info("order details page is refreshed");
 		Thread.sleep(3000);
 
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot,
-					new File("target/screenshots/RelaunchedFrontEndOrderDetails-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("relaunched_feorder_details_" + orderid);
 
 		log.info("After page refresh, master account id displaying is: " + masteraccount.getAttribute("value"));
 
@@ -1696,25 +1883,13 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftermasteraccountUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("account_info_post_masteracc_update_" + orderid);
 
 		driver.navigate().refresh();
 		log.info("order details page is refreshed");
 		Thread.sleep(3000);
 
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot,
-					new File("target/screenshots/RelaunchedFrontEndOrderDetails-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("relaunched_feorder_details_" + orderid);
 
 		log.info("After page refresh, master account id displaying is: " + masteraccount.getAttribute("value"));
 
@@ -1751,25 +1926,12 @@ public class order_backendorder_page extends BaseClass {
 		Alert alert = driver.switchTo().alert();
 		log.info("alert msg is:- " + alert.getText());
 		alert.accept();
-		File screenshot2 = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot2, new File("target/screenshots/AccountInfoAftermasteraccountUPDATE.jpg"));
-			log.info("ADDRESS INFO section screenshot captured to check updated info");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-
+		DriverUtils.getScreenshot("account_info_post_masteraccount_update_" + orderid);
 		driver.navigate().refresh();
 		log.info("order details page is refreshed");
 		Thread.sleep(3000);
 
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot,
-					new File("target/screenshots/RelaunchedFrontEndOrderDetails-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("relaunched_feorder_details_" + orderid);
 
 		log.info("After page refresh, order account id displaying is: " + orderaccount.getAttribute("value"));
 
@@ -1793,12 +1955,7 @@ public class order_backendorder_page extends BaseClass {
 
 	public void orderGridScreenshot() {
 		js.executeScript("scroll(0, 180);");
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/ordergrid-" + orderid + ".jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
+		DriverUtils.getScreenshot("order_grid_" + orderid);
 	}
 
 	// -----------------------------TBD flow methods-----------------
@@ -2105,22 +2262,10 @@ public class order_backendorder_page extends BaseClass {
 		log.info("Order id visible in grid is= " + attachedorderiddata);
 		if (attachedorderiddata.equals(orderid)) {
 			log.info("correct order id is visible");
-			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			try {
-				FileUtils.copyFile(screenshot,
-						new File("target/screenshots/tbdorder-correctactualorder-" + orderid + ".jpg"));
-			} catch (IOException e) {
-				System.out.println(e.getMessage());
-			}
+			DriverUtils.getScreenshot("tbdorder_correct_actualorder_" + orderid);
 		} else {
 			log.info("incorect order id is visible");
-			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			try {
-				FileUtils.copyFile(screenshot,
-						new File("target/screenshots/tbdorder-incorrectactualorder-" + orderid + ".jpg"));
-			} catch (IOException e) {
-				System.out.println(e.getMessage());
-			}
+			DriverUtils.getScreenshot("tbdorder_incorrect_actualorder_" + orderid);
 		}
 	}
 
@@ -2129,6 +2274,7 @@ public class order_backendorder_page extends BaseClass {
 
 	public void openActualOrderDetailspage() {
 		oldtab = driver.getWindowHandle();
+		waitForLoaderToDisappear();
 		orderid_link.click();
 
 		ArrayList<?> newtab = new ArrayList<Object>(driver.getWindowHandles());
@@ -2196,14 +2342,8 @@ public class order_backendorder_page extends BaseClass {
 			log.info("Available qty is corect");
 		else
 			log.info("availabel qty is incorrect");
-
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/tbdorderavailableqtyafterorderupdate.jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-
+		DriverUtils.getScreenshot("/tbdorder_availableqty_afterorder_update_" + orderid);
+		
 	}
 
 	public void checkQtyOfCancelActualOrderAndtakeScreenshot() throws Exception {
@@ -2214,15 +2354,9 @@ public class order_backendorder_page extends BaseClass {
 			log.info("Available qty is corect");
 		else
 			log.info("availabel qty is incorrect");
-
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/tbdorderavailableqtyafterorderupdate.jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
+		DriverUtils.getScreenshot("tbdorder_availableqty_afterorder_update_" + orderid);
+		
 		}
-
-	}
 
 	public void checkQtyOfRefundActualOrderAndtakeScreenshot() throws Exception {
 
@@ -2233,14 +2367,8 @@ public class order_backendorder_page extends BaseClass {
 			log.info("Available qty is corect");
 		else
 			log.info("availabel qty is incorrect");
-
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/tbdorderavailableqtyafterorderupdate.jpg"));
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-
+		DriverUtils.getScreenshot("tbdorder_availableqty_afterorder_update_" + orderid);
+		
 	}
 
 }

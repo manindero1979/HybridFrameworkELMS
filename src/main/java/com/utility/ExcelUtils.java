@@ -12,9 +12,9 @@ import com.models.Credentials;
 public class ExcelUtils {
 
     public static Credentials getCredentials(String application, String role) throws Exception {
-
+        String excelFile = PropertyUtils.readProperty("excelFile");
         String excelPath = System.getProperty("user.dir")
-                + "/src/test/resources/logindata_stage.xls";
+                + "/src/test/resources/" + excelFile;
 
         FileInputStream fis = new FileInputStream(excelPath);
 

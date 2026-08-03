@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.base.BaseClass;
@@ -133,7 +134,9 @@ public class pspstudent_page extends BaseClass{
 			
 			Thread.sleep(1000);
 			log.info("exam submission alert msg is: " + alert_examsubmission.getText());
-			ok_alert_examsubmission.click();
+			waitForLoaderToDisappear();
+			wait.until(ExpectedConditions.elementToBeClickable(	ok_alert_examsubmission)).click();
+	
 			log.info("Alert OK clciked");
 			Thread.sleep(2000);
 			

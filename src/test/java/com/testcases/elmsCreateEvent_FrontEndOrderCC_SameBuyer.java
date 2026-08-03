@@ -8,9 +8,11 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.base.BaseClass;
+import com.models.Credentials;
 import com.pages.createevent_frontendorder_page1;
 import com.pages.login_page;
 import com.pages.logout_page;
+import com.utility.ExcelUtils;
 import com.utility.PropertyUtils;
 
 public class elmsCreateEvent_FrontEndOrderCC_SameBuyer extends BaseClass {
@@ -29,16 +31,17 @@ public class elmsCreateEvent_FrontEndOrderCC_SameBuyer extends BaseClass {
 
 	@Test(priority = 1)
 	public void login() throws Exception {
-		log.info("************** Verifying Login Test *****************");
-		Thread.sleep(5000);
-		log.info("we are inside login method of createaccounts class");
-		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
-		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
 
-		lp.loginToelms(elmsadminuser, elmsadminpassword);
-		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
-		log.info("after successful login page title is: " + driver.getTitle());
+	    log.info("************** Verifying Login Test *****************");
+
+	    Credentials admin = ExcelUtils.getCredentials("elms", "admin");
+
+	    lp.loginToelms(admin.getUsername(), admin.getPassword());
+
+	    Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+
 	}
+
 
 	@Test(priority = 2)
 	public void Create_PublicOnlineEvent() throws Exception {
@@ -150,7 +153,7 @@ public class elmsCreateEvent_FrontEndOrderCC_SameBuyer extends BaseClass {
 		cefe.placeOrder();
 		Thread.sleep(2000);
 	}
-	//@Test(priority = 5)
+	@Test(priority = 5)
 	public void logout() throws Exception {
 		logpage = new logout_page(driver);
 		logpage.elmsLogoutApplication();

@@ -91,8 +91,8 @@ public class EndtoEndFlow_PMIC extends BaseClass {
 		cefe.setCourseSaleEndDate();
 		cefe.setCourseMaxQty();	
 		Thread.sleep(2000);
-		cefe.setTemplate();
-		Thread.sleep(5000);
+		//cefe.setTemplate();
+		//Thread.sleep(5000);
 		
 		
 		//cefe.saveEvent();

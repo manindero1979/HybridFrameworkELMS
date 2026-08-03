@@ -1,10 +1,14 @@
 package com.pages;
 
+import java.time.Duration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,10 +24,15 @@ public class logout_page extends BaseClass {
 
 	@FindBy(xpath = "//div[text()='You have logged out.']")
 	private WebElement msglogoutsuccess;
-
+	private WebDriverWait wait;
 	// constructor
 	public logout_page(WebDriver driver) {
-		PageFactory.initElements(driver, this);// InitElement method will initialize all web element in one go
+		 this.driver = driver;
+
+		    this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
+		    PageFactory.initElements(driver, this);
+		//PageFactory.initElements(driver, this);// InitElement method will initialize all web element in one go
 	}
 
 	// simple method to logout app
@@ -69,7 +78,8 @@ public class logout_page extends BaseClass {
 
 	}
 
-	@FindBy(xpath = "//a[@title='LogOut']")
+	//@FindBy(xpath = "//a[@title='LogOut']")
+	@FindBy(xpath = "//span[text()='LogOut']")
 	private WebElement link_logout_pspstudent;
 	
 	@FindBy(xpath = "//a[@id='lnkPSPPortal']")
@@ -77,8 +87,10 @@ public class logout_page extends BaseClass {
 
 	public void pspstudentLogoutApplication() throws Exception {
 		log.info("I am inside pspstudent logout method");
-		pragmatic_logo.click();
-		log.info("preagmatic logo clicked");
+		waitForLoaderToDisappear();
+		wait.until(ExpectedConditions.elementToBeClickable(link_logout_pspstudent)).click();
+		//link_logout_pspstudent.click();
+		log.info("student portal Logout link clicked");
 		Thread.sleep(2000);
 
 	}

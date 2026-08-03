@@ -6,9 +6,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.base.BaseClass;
+import com.models.Credentials;
 import com.pages.contacts_page;
 import com.pages.login_page;
 import com.pages.logout_page;
+import com.utility.ExcelUtils;
 import com.utility.PropertyUtils;
 
 public class elmsCreateContacts extends BaseClass {
@@ -28,16 +30,17 @@ public class elmsCreateContacts extends BaseClass {
 
 	@Test(priority = 1)
 	public void login() throws Exception {
-		log.info("************** Verifying Login Test *****************");
-		Thread.sleep(5000);
-		log.info("we are inside login method of createaccounts class");
-		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
-		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
 
-		lp.loginToelms(elmsadminuser, elmsadminpassword);
-		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
-		log.info("after successful login page title is: " + driver.getTitle());
+	    log.info("************** Verifying Login Test *****************");
+
+	    Credentials admin = ExcelUtils.getCredentials("elms", "admin");
+
+	    lp.loginToelms(admin.getUsername(), admin.getPassword());
+
+	    Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+
 	}
+
 
 	@Test(priority = 2)
 	public void Create_Contacts() throws Exception {

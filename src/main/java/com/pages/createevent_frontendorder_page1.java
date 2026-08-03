@@ -28,6 +28,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.base.BaseClass;
+import com.utility.DriverUtils;
 import com.utility.PropertyUtils;
 
 public class createevent_frontendorder_page1 extends BaseClass {
@@ -592,16 +593,8 @@ public class createevent_frontendorder_page1 extends BaseClass {
 		Select portalbeta = new Select(drpdown_portalbeta);
 		portalbeta.selectByVisibleText("Yes");
 		log.info("Portal Beta=YES is set");
-		
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(screenshot, new File("target/screenshots/portalbetaYESisset-" + ename + ".jpg"));
-			log.info("screenshot captured");
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-
-		
+	    DriverUtils.getScreenshot("portalbetaYESisset-_" + ename);
+				
 	}
 	
 	// public event
@@ -752,9 +745,8 @@ public class createevent_frontendorder_page1 extends BaseClass {
 		log.info("SAVE button clciked");
 		Thread.sleep(5000);
 		js.executeScript("scroll(0, 300);");
-		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		FileUtils.copyFile(screenshot, new File("target/screenshots/eventcancelled" + existingeventnameforupdatingstatus_data + ".jpg"));
-		log.info("screenshot captured");
+	    DriverUtils.getScreenshot("eventcancelled_" + existingeventnameforupdatingstatus_data);
+	 	log.info("screenshot captured");
 
 	}
 	
@@ -795,6 +787,8 @@ public class createevent_frontendorder_page1 extends BaseClass {
 
 	public void setRegistrantItemQty(String qty) throws Exception {
 		// String itemqty_data = PropertyUtils.readProperty("itemqty");
+		//DriverUtils.getScreenshot("eventcancelled_" + existingeventnameforupdatingstatus_data);
+	    
 		File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		try {
 			FileUtils.copyFile(screenshot, new File("target/screenshots/defaultqtyforpurchase.jpg"));
@@ -806,7 +800,7 @@ public class createevent_frontendorder_page1 extends BaseClass {
 		select_quantity.selectByVisibleText(qty);
 		log.info("Product item qty is selected");
 		Thread.sleep(6000);
-		//btn_register.click();
+		btn_register.click();
 		//log.info("REGISTER button clicked");
 	}
 	
@@ -1484,19 +1478,27 @@ public class createevent_frontendorder_page1 extends BaseClass {
 	@FindBy(xpath = "//div[@class='place-order-primary']//button[@title='Place Order']")
 	private WebElement btn_placeorder;
 
-	public void setBillingInfo() throws Exception {
-		log.info("I am in setBillingInfo method");
-		billing_email.sendKeys(cartregistrant1_email);
-		Thread.sleep(6000);
-		Select copyinfo = new Select(drpdwn_copy_info);
+	public void setBillingInfo() {
 
-		String drpdownvaluetobeselected = cartregistrant_fnamel_data + " " + cartregistrant_lnamel_data + "("
-				+ cartregistrant1_email + ")";
-		copyinfo.selectByVisibleText(drpdownvaluetobeselected);
-		log.info("biller info selected from dropdown");
-		Thread.sleep(5000);
+	    log.info("Inside setBillingInfo()");
+
+	    wait.until(ExpectedConditions.visibilityOf(billing_email)).clear();
+	    billing_email.sendKeys(cartregistrant1_email);
+
+	    waitForLoaderToDisappear();
+
+	    wait.until(driver -> drpdwn_copy_info.isEnabled());
+
+	    String value = cartregistrant_fnamel_data + " "
+	            + cartregistrant_lnamel_data
+	            + "(" + cartregistrant1_email + ")";
+
+	    new Select(drpdwn_copy_info).selectByVisibleText(value);
+
+	    log.info("Billing info copied successfully.");
+
+	    waitForLoaderToDisappear();
 	}
-
 	public void generateNewBillerEmail() throws Exception {
 		System.out.println("----------generate new Biller email---------");
 		String newbillerfirstname_data = PropertyUtils.readProperty("newbillerfirstname");

@@ -47,16 +47,13 @@ public class event_page extends BaseClass {
 
 	// constructor
 	public event_page(WebDriver driver) {
-		this.driver = driver;
-		//wait = new WebDriverWait(driver, 50, 50);
-		WebDriverWait wait = new WebDriverWait(
-		        driver,
-		        Duration.ofSeconds(50)
-		);
-		//wait = new WebDriverWait(driver, Duration.ofSeconds(50)); 
-		PageFactory.initElements(driver, this);
-	}
 
+	    this.driver = driver;
+
+	    this.wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+
+	    PageFactory.initElements(driver, this);
+	}
 	// javascript for scrolling
 	JavascriptExecutor js = (JavascriptExecutor) driver;
 

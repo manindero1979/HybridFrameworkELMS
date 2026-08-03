@@ -4,9 +4,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.base.BaseClass;
+import com.models.Credentials;
 import com.pages.login_page;
 import com.pages.logout_page;
 import com.pages.order_backendorder_page;
+import com.utility.ExcelUtils;
 import com.utility.PropertyUtils;
 
 //engp-609
@@ -26,16 +28,17 @@ public class elmsCreateTBDOrder_CreateActualOrder_CancelActualOrder extends Base
 
 	@Test(priority = 2)
 	public void login() throws Exception {
-		log.info("************** Verifying Login Test *****************");
-		Thread.sleep(5000);
-		log.info("we are inside login method of createaccounts class");
-		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
-		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
 
-		lp.loginToelms(elmsadminuser, elmsadminpassword);
-		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
-		log.info("after successful login page title is: " + driver.getTitle());
+	    log.info("************** Verifying Login Test *****************");
+
+	    Credentials admin = ExcelUtils.getCredentials("elms", "admin");
+
+	    lp.loginToelms(admin.getUsername(), admin.getPassword());
+
+	    Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+
 	}
+
 
 	@Test(priority = 3)
 	public void CreateTBDOrder() throws Exception {
@@ -83,8 +86,8 @@ public class elmsCreateTBDOrder_CreateActualOrder_CancelActualOrder extends Base
 		Thread.sleep(1000);
 
 		beo.saveRegistrant();
-		Thread.sleep(5000);
-		beo.setFreeShipping();
+		//Thread.sleep(5000);
+	//beo.setFreeShipping();
 		Thread.sleep(3000);
 		beo.paylaterPaymentoptionActualOrder(); //this is set when we want to edit OR cancel actual order
 		Thread.sleep(2000);

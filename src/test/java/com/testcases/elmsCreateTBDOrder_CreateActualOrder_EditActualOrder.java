@@ -4,9 +4,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.base.BaseClass;
+import com.models.Credentials;
 import com.pages.login_page;
 import com.pages.logout_page;
 import com.pages.order_backendorder_page;
+import com.utility.ExcelUtils;
 import com.utility.PropertyUtils;
 
 //engp-609
@@ -26,15 +28,15 @@ public class elmsCreateTBDOrder_CreateActualOrder_EditActualOrder extends BaseCl
 
 	@Test(priority = 2)
 	public void login() throws Exception {
-		log.info("************** Verifying Login Test *****************");
-		Thread.sleep(5000);
-		log.info("we are inside login method of createaccounts class");
-		String elmsadminuser = PropertyUtils.readProperty("elmsadminuser");
-		String elmsadminpassword = PropertyUtils.readProperty("elmsadminpassword");
 
-		lp.loginToelms(elmsadminuser, elmsadminpassword);
-		Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
-		log.info("after successful login page title is: " + driver.getTitle());
+	    log.info("************** Verifying Login Test *****************");
+
+	    Credentials admin = ExcelUtils.getCredentials("elms", "admin");
+
+	    lp.loginToelms(admin.getUsername(), admin.getPassword());
+
+	    Assert.assertEquals(driver.getTitle(), "Dashboard / Magento Admin");
+
 	}
 
 	@Test(priority = 3)
@@ -74,22 +76,18 @@ public class elmsCreateTBDOrder_CreateActualOrder_EditActualOrder extends BaseCl
 		Thread.sleep(5000);// ---
 		beo.clickAddSelectedProductToOrderBtn();
 		
-		Thread.sleep(8000);
+		//Thread.sleep(8000);
 		beo.clicOnAddRegistrantsBtn();
 		Thread.sleep(3000);
 		beo.generateNewRegistrantsEmail();
 		beo.createNewRegistrant();
-		Thread.sleep(1000);
-
+		Thread.sleep(4000);
 		beo.saveRegistrant();
-		Thread.sleep(5000);
-		
-		beo.setFreeShipping();
-		Thread.sleep(1000);
-		beo.paylaterPaymentoptionActualOrder(); //this is set when we want to edit OR cancel actual order
-		
-		Thread.sleep(2000);
+		Thread.sleep(4000);
+		beo.setPaylaterPaymentoption();
+		Thread.sleep(4000);
 		beo.order_submit();
+		Thread.sleep(2000);
 	
 	}
 	@Test(priority = 5)
@@ -117,9 +115,9 @@ public class elmsCreateTBDOrder_CreateActualOrder_EditActualOrder extends BaseCl
 	public void openActualOrderAndEditit() throws Exception {
 		log.info("----------------Edition of Actual order will start-------------");
 		beo.openActualOrderDetailspage();
-		Thread.sleep(5000);	
+		Thread.sleep(2000);	
 		beo.clickEditOrderLink();
-		Thread.sleep(3000);
+		//Thread.sleep(3000);
 		beo.increaseItemQty();
 		beo.clickUpdateItemsAndQtyBtn();
 		Thread.sleep(5000);

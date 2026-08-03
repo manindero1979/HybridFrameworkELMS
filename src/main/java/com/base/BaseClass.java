@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -102,18 +103,17 @@ public class BaseClass {
 	    wait.until(ExpectedConditions.invisibilityOfElementLocated(
 	            By.cssSelector("div.loading-mask")));
 	}
+	
 	public void waitForLoaderToDisappear() {
 
-	    By loader = By.cssSelector("div.loading-mask");
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
 
-	    List<WebElement> loaders = driver.findElements(loader);
+	    wait.ignoring(StaleElementReferenceException.class);
 
-	    if (!loaders.isEmpty()) {
-
-	        new WebDriverWait(driver, Duration.ofSeconds(15))
-	                .until(ExpectedConditions.invisibilityOfElementLocated(loader));
-	    }
+	    wait.until(ExpectedConditions.invisibilityOfElementLocated(
+	            By.cssSelector("div.loading-mask")));
 	}
+
 	
 	public void intializationpsp() throws Exception {
 		String brow_name = PropertyUtils.readProperty("browser");
