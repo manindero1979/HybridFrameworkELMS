@@ -546,7 +546,7 @@ public class createevent_frontendorder_page1 extends BaseClass {
 		btn_publishevent.click();
 		log.info("EVENT PUBLISH BUTTON clicked");
 		  Thread.sleep(20000);
-		   
+		  DriverUtils.getScreenshot("eventcreated_"+ename);
 		
 			
 			/*
